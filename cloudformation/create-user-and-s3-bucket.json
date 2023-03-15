@@ -1,0 +1,37 @@
+{
+    "Resources": {
+        "MyBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "BucketName": "your-bucket-name",
+                "AccessControl": "Private"
+            }
+        },
+        "S3UploadUser": {
+            "Type": "AWS::IAM::User",
+            "Properties": {
+                "UserName": "s3-upload-user"
+            }
+        },
+        "S3BucketPolicy": {
+            "Type": "AWS::S3::BucketPolicy",
+            "Properties": {
+                "Bucket": { "Ref": "MyBucket" },
+                "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Sid": "AllowS3Uploads",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "AWS": { "Fn::GetAtt": [ "S3UploadUser", "Arn" ] }
+                            },
+                            "Action": [ "s3:*" ],
+                            "Resource": { "Fn::Join": [ "", [ "arn:aws:s3:::", { "Ref": "MyBucket" }, "/*" ] ] }
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}
